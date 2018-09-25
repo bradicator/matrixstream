@@ -11,7 +11,7 @@ def incremental_td2(U, U_egnval, V, V_egnval, x, n):
 		[f * R @ ZTU, f * R @ R.T]])
 	egnval, Gamma = np.linalg.eigh(H)
 	U_egnval_new = egnval[-r1:]
-	U_new = np.hstack((U, Q)) @ Gamma[:,-r1:]
+	U_new = np.hstack((U, Q)) @ Gamma[:,-r1:] 
 
 	Y = x.T @ U
 	YY = Y - V @ V.T @ Y

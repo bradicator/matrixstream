@@ -1,6 +1,9 @@
 import numpy as np
 
-""" code for offline tensor analysis"""
+"""
+Implementation of offline tensor analysis from Beyond Streams and Graphs:
+Dynamic Tensor Analysis.
+"""
 class ota2d(object):
     def __init__(self, tensor, r1 = 3, r2 = 3):
         """r1, r2 are number of PC we wish to retain"""
@@ -11,7 +14,11 @@ class ota2d(object):
         
     def fit(self, print_error = False, Us = None, Vs = None,\
             niter = 10):
-        """ fit the model by alternating least squares"""
+        """ 
+        fit the model by alternating least squares
+        no need to supply Us(tart) or V start.
+        niter = 10 should be sufficient.
+        """
         
         # initialize U start and V start
         if Us is None or Vs is None:
@@ -86,29 +93,30 @@ class ota2d(object):
         return self.meanerr
 
 #%%
-""" test case """
-m, T, r = 30, 300, 3
-sigma = 0.1
-np.random.seed(5)
-Ut, R = np.linalg.qr(np.random.normal(size = (m, r)))
-Vt, R = np.linalg.qr(np.random.normal(size = (m, r)))
-M_mean = Ut.dot(np.diag([r-i for i in range(r)])).dot(Vt.T)
-Tensor = np.zeros((m, m, T))
-for i in range(T):
-	Tensor[:,:,i] = M_mean + np.random.normal(scale = sigma, size = (m, m))        
-
-#%%
-model = ota2d(Tensor)
-model.fit()
-model.error()
-model.meanerr
-
-#%%
-"""
-oracle error: knowing the real row/column subspace, what is recon
-error
-"""
-trutherror = [np.linalg.norm(Tensor[:,:,i] - np.linalg.multi_dot([Ut, Ut.T, Tensor[:,:,i], Vt, Vt.T])) ** 2 /\
- np.linalg.norm(Tensor[:,:,i]) ** 2 \
- for i in range(T)]
-np.mean(trutherror)
+if __name__=="__main__":
+    """ test case """
+    m, T, r = 30, 300, 3
+    sigma = 0.1
+    np.random.seed(5)
+    Ut, R = np.linalg.qr(np.random.normal(size = (m, r)))
+    Vt, R = np.linalg.qr(np.random.normal(size = (m, r)))
+    M_mean = Ut.dot(np.diag([r-i for i in range(r)])).dot(Vt.T)
+    Tensor = np.zeros((m, m, T))
+    for i in range(T):
+    	Tensor[:,:,i] = M_mean + np.random.normal(scale = sigma, size = (m, m))        
+    
+    
+    model = ota2d(Tensor)
+    model.fit()
+    model.error()
+    model.meanerr
+    
+    
+    """
+    oracle error: knowing the real row/column subspace, what is recon
+    error
+    """
+    trutherror = [np.linalg.norm(Tensor[:,:,i] - np.linalg.multi_dot([Ut, Ut.T, Tensor[:,:,i], Vt, Vt.T])) ** 2 /\
+     np.linalg.norm(Tensor[:,:,i]) ** 2 \
+     for i in range(T)]
+    np.mean(trutherror)
