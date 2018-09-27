@@ -10,11 +10,15 @@ Incremental tensor analysis in our paper
 import numpy as np 
 
 class ita2d(object):
-    def __init__(self, tensor, r1 = 3, r2 = 3):
+    def __init__(self, tensor, r1 = 3, r2 = 3, onemore = False):
         """r1, r2 are number of PC we wish to retain"""
         self.t = tensor
         self.r1 = r1
         self.r2 = r2
+        if onemore:
+            self.r1 += 1
+            self.r2 += 1
+        self.onemore = onemore
         self.m, self.n, self.T = tensor.shape
         
     def ita(self, first_r1_eigenvalues, first_r1_eigenvectors, first_r2_eigenvalues, 
@@ -104,6 +108,9 @@ class ita2d(object):
             PU = self.Ucur.dot(self.Ucur.T)
             PV = self.Vcur.dot(self.Vcur.T)
             
+            if self.onemore:
+                PU = self.Ucur[:,:-1].dot(self.Ucur[:,:-1].T)
+                PV = self.Vcur[:,:-1].dot(self.Vcur[:,:-1].T)
             that = PU.dot(X).dot(PV)
             emat = that - X
             
